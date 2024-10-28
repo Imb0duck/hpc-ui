@@ -1,18 +1,13 @@
-/*(function () {
+(function () {
     const vscode = acquireVsCodeApi();
-    document.getElementById('GET_TOKEN_BUTTON').addEventListener('click', ()=> {
+    document.getElementById('get-token-button').addEventListener('click', ()=> {
+        const login = document.getElementById('login').value;
+        const password = document.getElementById('password').value;
+        document.getElementById('login').value = "";
+        document.getElementById('password').value = "";
         vscode.postMessage({ 
             type: 'requestToken', 
-            data: 'Token requested'
+            data: { login, password }
         });
     });
-}());*/
-
-import React from 'react';
-import ReactDOM from 'react-dom';
-import LeftPanel from './components/LeftPanel';
-
-const vscode = acquireVsCodeApi();
-
-// Рендерим компонент в DOM
-ReactDOM.render(<LeftPanel message="HPC UI" />, document.getElementById('root'));
+}());
