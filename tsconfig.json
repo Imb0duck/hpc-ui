@@ -1,0 +1,24 @@
+{
+	"compilerOptions": {
+		"module": "Node16",
+		"target": "ES2022",
+		"lib": ["ES2022", "DOM"],
+		"sourceMap": true,
+		"rootDir": "src",
+		"outDir": "dist",
+		"baseUrl": "./src",
+		"paths" : {
+			"*": ["*"],
+		},
+		"strict": false,
+		"jsx": "react-jsx",
+		"noUnusedParameters": false,
+		"noEmitHelpers": true,
+		"importHelpers": true,
+	},
+	"include": ["src/**/*"],
+	"exclude": [
+		"node_modules",
+		".vscode-test"
+	]
+}
