@@ -28,6 +28,19 @@ export class LeftPanelWebview implements WebviewViewProvider {
 		this.activateMessageListener();
 	}
 
+    printTree(directory: { dirs: string[]; files: string[] }, indent: string = ''): void {
+		console.log(`${indent}directory/`);
+		indent += '    ';
+
+        for (const dir of directory.dirs) {
+			console.log(`${indent}${dir}/`);
+		}
+
+        for (const file of directory.files) {
+			console.log(`${indent}${file}`);
+		}
+	}
+
 	executeCommand(command: string): Promise<string> {
 		return new Promise((resolve, reject) => {
 		  exec(command, (error, stdout, stderr) => {
@@ -60,12 +73,9 @@ export class LeftPanelWebview implements WebviewViewProvider {
 								userdata.user_id = parsedData.tokens[0].user_id;
 								window.showInformationMessage("Token requested");
 							} else if ('errorType' in parsedData) {
-								const code = parsedData.code;
-								const errorType = parsedData.errorType;
-								const errorMessage = parsedData.errorMessage;
-								window.showInformationMessage(`Code: ${code}`);
-								window.showInformationMessage(`Error Type: ${errorType}`);
-								window.showInformationMessage(`Error Message: ${errorMessage}`);
+								console.log(`Code: ${parsedData.code}` + '\n' + `Error Type: ${parsedData.errorType}` 
+									+ '\n' + `Error Message: ${parsedData.errorMessage}`)
+								window.showInformationMessage(parsedData.errorMessage);
 							} else {
 								console.log("Unknown data type");
 							}
@@ -77,13 +87,90 @@ export class LeftPanelWebview implements WebviewViewProvider {
 					});
 					break;
 				  }
-				case "loginData": {
-					if (!message.data) {
-					  return;
+				case "requestUserData": {
+					if(userdata.token === ""){
+						window.showInformationMessage("Missing token");
+						break;
 					}
-					window.showInformationMessage(message.data.login);
+					this.executeCommand("curl -X GET \ http://hpccloud.ssd.sscc.ru/api/1.0/users?access_token=" + userdata.token)
+					.then(output => {
+						try {
+							const parsedData = JSON.parse(output);
+						  
+							if ('users' in parsedData) {
+								console.log(`ID: ${parsedData.id}` + '\n' + `Level: ${parsedData.lvl}` 
+									+ '\n' + `Login: ${parsedData.login}` + '\n' + `Password: ${parsedData.password}` 
+									+ '\n' + `Firstname: ${parsedData.firstname}` + '\n' + `Lasname: ${parsedData.lastname}` 
+									+ '\n' + `Email: ${parsedData.e_mail}` + '\n' + `Phone:  ${parsedData.phone}`);
+							} else if ('errorType' in parsedData) {
+								console.log(`Code: ${parsedData.code}` + '\n' + `Error Type: ${parsedData.errorType}` 
+									+ '\n' + `Error Message: ${parsedData.errorMessage}`)
+								window.showInformationMessage(parsedData.errorMessage);
+							} else {
+								console.log("Unknown data type");
+							}
+						  } catch (error) {
+							console.error("Error with JSON parsing:", error);
+						  }
+					}).catch(error => {
+						console.error(error);
+					});
 					break;
 				  }
+				case "requestProjectList": {
+					this.executeCommand("curl -X GET \ http://hpccloud.ssd.sscc.ru/api/1.0/projects?access_token=" + userdata.token)
+					.then(output => {
+						try {
+							const parsedData = JSON.parse(output);
+						  
+							console.log(output); //Make a normal output 
+						  } catch (error) {
+							console.error("Error with JSON parsing:", error);
+						  }
+					}).catch(error => {
+						console.error(error);
+					});
+					break;
+				}
+				case "requestTaskList": {
+					this.executeCommand("curl -X GET \ http://hpccloud.ssd.sscc.ru/api/1.0/jobs?access_token=" + userdata.token)
+					.then(output => {
+						try {
+							const parsedData = JSON.parse(output);
+						  
+							console.log(output); //Make a normal output 
+						  } catch (error) {
+							console.error("Error with JSON parsing:", error);
+						  }
+					}).catch(error => {
+						console.error(error);
+					});
+					break;
+				}
+				case "requestHomeFileList": {
+					this.executeCommand("curl -X GET \ http://hpccloud.ssd.sscc.ru/api/1.0/fs/?access_token=" + userdata.token)
+					.then(output => {
+						try {
+							const parsedData = JSON.parse(output);
+						  
+							if ('directory' in parsedData) {
+								this.printTree(parsedData);
+							} else if ('errorType' in parsedData) {
+								console.log(`Code: ${parsedData.code}` + '\n' + `Error Type: ${parsedData.errorType}` 
+									+ '\n' + `Error Message: ${parsedData.errorMessage}`)
+								window.showInformationMessage(parsedData.errorMessage);
+							} else {
+								console.log("Unknown data type");
+							}
+						  } catch (error) {
+							console.error("Error with JSON parsing:", error);
+						  }
+					}).catch(error => {
+						console.error(error);
+					});
+					break;
+				}
+
 				case "onInfo": {
 				  if (!message.data) {
 					return;
@@ -132,7 +219,25 @@ export class LeftPanelWebview implements WebviewViewProvider {
 			<div class='panel-wrapper'>
                 <input class="input-field" type="text" placeholder="login" id="login" name="login">
                 <input class="input-field" type="password" placeholder="password"  id="password" name="password">
+				<input class="input-field" type="text" placeholder="path to catalog"  id="catalog-path" name="catalog-path">
+				<input class="input-field" type="text" placeholder="path to file"  id="file-path" name="file-path">
+				<input class="input-field" type="text" placeholder="project ID"  id="project-id" name="project-id">
+				<input class="input-field" type="text" placeholder="build ID"  id="build-id" name="build-id">
+				<input class="input-field" type="text" placeholder="task ID"  id="task-id" name="task-id">
                 <button id="get-token-button">GET TOKEN</button>
+				<button id="get-user-data">USER DATA</button>
+				<button id="get-project-list">PROJECT LIST</button>
+				<button id="get-task-list">TASK LIST</button>
+				<button id="get-home-file-list">FILE LIST(HOME)</button>
+				<button id="get-catalog-file-list">FILE LIST(CATALOG)</button>
+				<button id="create-new-user">NEW USER</button>
+				<button id="get-profile-list">PROFILE LIST</button>
+				<button id="create-new-project">NEW PROJECT</button>
+				<button id="download-file">DOWNLOAD FILE</button>
+				<button id="build-project">BUILD PROJECT</button>
+				<button id="build-status">BUILD STATUS</button>
+				<button id="create-new-task">CREATE TASK</button>
+				<button id="task-status">TASK STATUS</button>
             </div>
 
 			<script nonce="${nonce}" src="${scriptUri}"></script>
