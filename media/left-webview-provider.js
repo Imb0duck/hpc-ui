@@ -20,9 +20,9 @@
             type: 'requestProjectList'
         });
     });
-    document.getElementById('get-task-list').addEventListener('click', ()=> {
+    document.getElementById('get-job-list').addEventListener('click', ()=> {
         vscode.postMessage({ 
-            type: 'requestTaskList'
+            type: 'requestJobList'
         });
     });
     document.getElementById('get-home-file-list').addEventListener('click', ()=> {
@@ -39,13 +39,23 @@
         });
     });
     document.getElementById('create-new-user').addEventListener('click', ()=> {
-        const login = document.getElementById('login').value;
-        const password = document.getElementById('password').value;
-        document.getElementById('login').value = "";
-        document.getElementById('password').value = "";
+        const login = document.getElementById('new-login').value;
+        const password = document.getElementById('new-password').value;
+        const lvl = document.getElementById('lvl').value;
+        const firstname = document.getElementById('firstname').value;
+        const lasname = document.getElementById('lasname').value;
+        const e_mail = document.getElementById('e_mail').value;
+        const access_code = document.getElementById('access_code').value;
+        document.getElementById('new-login').value = "";
+        document.getElementById('new-password').value = "";
+        document.getElementById('lvl').value = "";
+        document.getElementById('firstname').value = "";
+        document.getElementById('lasname').value = "";
+        document.getElementById('e_mail').value = "";
+        document.getElementById('access_code').value = "";
         vscode.postMessage({ 
             type: 'createNewUser', 
-            data: { login, password }
+            data: { login, password, lvl, firstname, lasname, e_mail, access_code }
         });
     });
     document.getElementById('get-profile-list').addEventListener('click', ()=> {
@@ -54,8 +64,19 @@
         });
     });
     document.getElementById('create-new-project').addEventListener('click', ()=> {
+        const type = document.getElementById('project-type').value;
+        const projectName = document.getElementById('project-name').value;
+        const template = document.getElementById('template').value;
+        const cluster_profile = document.getElementById('cluster_profile').value;
+        const make_config = document.getElementById('make_configuration').value;
+        document.getElementById('project-type').value = "";
+        document.getElementById('project-name').value = "";
+        document.getElementById('template').value = "";
+        document.getElementById('cluster_profile').value = "";
+        document.getElementById('make_configuration').value = "";
         vscode.postMessage({ 
-            type: 'createNewProject'
+            type: 'createNewProject',
+            data: {type, projectName, template, cluster_profile, make_config}
         });
     });
     document.getElementById('download-file').addEventListener('click', ()=> {
@@ -75,9 +96,9 @@
         });
     });
     document.getElementById('build-status').addEventListener('click', ()=> {
-        const projectID = document.getElementById('project-id').value;
+        const projectID = document.getElementById('build-project-id').value;
         const buildID = document.getElementById('build-id').value;
-        document.getElementById('project-id').value = "";
+        document.getElementById('build-project-id').value = "";
         document.getElementById('build-id').value = "";
         vscode.postMessage({ 
             type: 'buildStatus', 

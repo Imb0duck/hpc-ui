@@ -26,9 +26,12 @@
 				"reveal": "never",
 				"group": "watchers"
 			},
-			"group": "build"
+			"group": {
+				"kind": "build"
+			}
 		},
 		{
+			"type": "npm",
 			"label": "tasks: watch-tests",
 			"dependsOn": [
 				"npm: watch",

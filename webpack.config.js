@@ -52,19 +52,6 @@ const extensionConfig = {
         exclude: /node_modules/,
         use: [ 'style-loader', 'css-loader']
       },
-      {
-        test: /\.(js|jsx)$/, // Обработка файлов с расширениями .js и .jsx
-        exclude: /node_modules/, // Исключение для node_modules
-        use: {
-            loader: 'babel-loader', // Используем babel-loader
-            options: {
-                presets: [
-                    '@babel/preset-env', // Для поддержки современных возможностей JS
-                    '@babel/preset-react' // Для поддержки JSX
-                ]
-            }
-        }
-      }
     ]
   },
   devtool: 'nosources-source-map',
